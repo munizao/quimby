@@ -1,0 +1,11 @@
+Source: quimby-gtk-input-method
+Priority: optional
+Maintainer: Alexandre Muñiz <pz@puzzlezapper.com>
+Build-Depends: debhelper (>= 5), autotools-dev, intltool, libgtk2.0-dev (>= 2.8.0)
+Standards-Version: 3.7.2
+Section: utils
+
+Package: quimby-gtk-immodule
+Architecture: any
+Depends: ${shlibs:Depends}, libgtk2.0-bin
+Description: gtk input method with extra compose sequences, pasting from primary selection, caps toggling.

@@ -1,0 +1,9 @@
+*** Introduction
+
+Quimby is a GTK+ input method which has some extra features that I found lacking in the default gtk input method. Among these are extra compose sequences, the ability to paste from the Primary selection, and the ability to toggle capitalization.
+When this has been installed, you can choose the "quimby" menu item from the "Input Methods" submenu when right-clicking in a GTK+ text entry area. In most cases it will automatically be the default input method once installed.
+
+
+*** Contact
+
+Please contact Alexandre Muñiz, <pz@puzzlezapper.com>

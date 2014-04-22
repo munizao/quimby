@@ -1,0 +1,3 @@
+2007-01-24  Daniel Elstner  <danielk@openismus.com>
+
+	* POTFILES.in: Add src/im-multipress.c.

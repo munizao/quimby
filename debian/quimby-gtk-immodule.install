@@ -1,0 +1,4 @@
+#etc/im-quimby.conf
+usr/lib/gtk-2.0/2.*.0/immodules/im-quimby.la
+usr/lib/gtk-2.0/2.*.0/immodules/im-quimby.so
+#usr/share/locale/*/LC_MESSAGES/quimby-gtk-input-method.po
