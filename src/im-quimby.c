@@ -834,7 +834,22 @@ quimby_filter_keypress (GtkIMContext *context,
     gint cursor_index;
     gint len;
     gchar utf8_buf[10];
-    if (event->keyval == GDK_F23 && event->type == GDK_KEY_RELEASE)
+    if (event->keyval == GDK_F22 && event->type == GDK_KEY_PRESS)
+    {
+	if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
+	{
+	    /* note: as is, this doesn't check for special unicode characters */
+	    gunichar second = g_utf8_get_char(text+cursor_index+1);
+	    if (second)
+	    {
+		gtk_im_context_delete_surrounding (GTK_IM_CONTEXT (context), 1, 1);
+		len = g_unichar_to_utf8(second, utf8_buf);
+		utf8_buf[len] = '\0';
+		g_signal_emit_by_name (context, "commit", &utf8_buf);
+	    }
+	}
+    }
+    if (event->keyval == GDK_F23 && event->type == GDK_KEY_PRESS)
     {
 	if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
 	{
