@@ -49,7 +49,7 @@ struct _GtkComposeTable
  */
 
 
-/* I'd like to only have to explicitly write my own compose sequences, and not write all of the default ones. */
+/* I should only have to explicitly write my own compose sequences, and not include all of the default ones. For clarity, sequences that appear in the default table should be removed here. */
 static guint16 quimby_compose_seqs[] = {
   GDK_Multi_key,	GDK_space,	GDK_Left,	0,	0,	0x2190,	/* LEFTWARDS_ARROW */
   GDK_Multi_key,	GDK_space,	GDK_Up,	0,	0,	0x2191,	/* UPWARDS_ARROW */
@@ -267,7 +267,7 @@ static guint16 quimby_compose_seqs[] = {
   GDK_Multi_key,	GDK_9,	GDK_s,	0,	0,	0x2079,	/* SUPERSCRIPT_NINE */
   GDK_Multi_key,	GDK_colon,	GDK_period,	0,	0,	0x2234,	/* THEREFORE */
   GDK_Multi_key,	GDK_colon,	GDK_colon,	0,	0,	0x2237,	/* PROPORTION */
-  GDK_Multi_key,	GDK_colon,	GDK_O,	0,	0,	0x0150,	/* LATIN_CAPITAL_LETTER_O_WITH_DOUBLE_ACUTE */ /* TODO: double check reversed */
+  GDK_Multi_key,	GDK_colon,	GDK_O,	0,	0,	0x0150,	/* LATIN_CAPITAL_LETTER_O_WITH_DOUBLE_ACUTE */
   GDK_Multi_key,	GDK_colon,	GDK_U,	0,	0,	0x0170,	/* LATIN_CAPITAL_LETTER_U_WITH_DOUBLE_ACUTE */
   GDK_Multi_key,	GDK_colon,	GDK_o,	0,	0,	0x0151,	/* LATIN_SMALL_LETTER_O_WITH_DOUBLE_ACUTE */
   GDK_Multi_key,	GDK_colon,	GDK_u,	0,	0,	0x0171,	/* LATIN_SMALL_LETTER_U_WITH_DOUBLE_ACUTE */
@@ -834,21 +834,26 @@ quimby_filter_keypress (GtkIMContext *context,
     gint cursor_index;
     gint len;
     gchar utf8_buf[10];
+    /* Transpose characters */
     if (event->keyval == GDK_F22 && event->type == GDK_KEY_PRESS)
     {
 	if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
 	{
-	    /* note: as is, this doesn't check for special unicode characters */
-	    gunichar second = g_utf8_get_char(text+cursor_index+1);
-	    if (second)
+	    /* note: as is, this doesn't check for combining marks, other special unicode characters */
+	    if (g_utf8_strlen(text, -1) < cursor_index + 1)
 	    {
-		gtk_im_context_delete_surrounding (GTK_IM_CONTEXT (context), 1, 1);
-		len = g_unichar_to_utf8(second, utf8_buf);
-		utf8_buf[len] = '\0';
-		g_signal_emit_by_name (context, "commit", &utf8_buf);
+		gunichar second = g_utf8_get_char(text+cursor_index+1);
+		if (second)
+		{
+		    gtk_im_context_delete_surrounding (GTK_IM_CONTEXT (context), 1, 1);
+		    len = g_unichar_to_utf8(second, utf8_buf);
+		    utf8_buf[len] = '\0';
+		    g_signal_emit_by_name (context, "commit", &utf8_buf);
+		}
 	    }
 	}
     }
+    /* Toggle capitalization */
     if (event->keyval == GDK_F23 && event->type == GDK_KEY_PRESS)
     {
 	if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
