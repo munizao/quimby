@@ -1,8 +1,13 @@
 *** Introduction
 
-Quimby is a GTK+ input method which has some extra features that I found lacking in the default gtk input method. Among these are extra compose sequences, the ability to paste from the Primary selection, and the ability to toggle capitalization.
+Quimby is a GTK+ input method which has some extra features that I found lacking in the default gtk input method. A large number of extra compose sequences are included. Another handy feature is the ability to paste from the Primary selection. If you've wanted to use the keyboard to paste selected text in the same way that you can with the middle mouse button on a Linux desktop, now you can. Use <compose> + <insert> if you have a compose key, or map the F24 key, (which I presume you don't physically have) to the key of your choice.
+
+
 When this has been installed, you can choose the "quimby" menu item from the "Input Methods" submenu when right-clicking in a GTK+ text entry area. In most cases it will automatically be the default input method once installed.
 
+Experimental features:
+· Toggling capitalization. (F23 key)
+· Transposing characters. (F22 key)
 
 *** Contact
 
