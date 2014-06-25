@@ -18,3 +18,26 @@ word_start_context (gchar *text, gint cursor_index)
     return is_start;
 }
 
+static void
+load_dictionary ()
+{
+
+}
+
+static void
+add_to_chord ()
+{
+}
+
+static void
+empty_chord ()
+{
+
+}
+
+static gchar *
+chord_lookup ()
+{
+
+}
+
