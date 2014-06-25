@@ -30,7 +30,7 @@
 "w": "with ",
 "wt": "with ", 
 //"wi": "with",
-"he": "he ",
+-"he": "he ",
 "b": "be",
 "be": "be ",
 "beg": "being",
@@ -204,4 +204,5 @@
 //note that this requires a shift to get the quote, 
 // so < may happen in place of ,. 
 //Literally all punctuation goes here. May be better to do programmatically.
+
 }
