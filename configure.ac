@@ -33,6 +33,18 @@ AC_CHECK_PROGS([GTK_QUERY_IMMODULES], [gtk-query-immodules-2.0])
 AS_IF([test "x$GTK_QUERY_IMMODULES" = x],
       [AC_MSG_FAILURE([gtk-query-immodules-2.0 not found.])])
 
+#GTK2_REQUIRED=2.24.0
+#PKG_CHECK_MODULES(GTK2, gtk+-2.0 >= GTK2_REQUIRED,
+#			[have_gtk2=yes], [have_gtk2=no])
+#AM_CONDITIONAL(HAVE_GTK2, test $have_gtk2 = "yes")
+#if test $have_gtk2 = "yes"; then
+#   gtk2_binary_version=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
+#   gtk2_libdir=`$PKG_CONFIG --variable=libdir gtk+-2.0`
+#   GTK2_IM_MODULEDIR="$gtk2_libdir"/gtk-2.0/$gtk2_binary_version/immodules
+#   AC_SUBST(GTK2_IM_MODULEDIR)
+#fi
+
+
 QUIMBY_ARG_WITH_IMMODULES_DIR()
 
 # The -w1 is there for the benefit of the Intel compiler.
