@@ -3,6 +3,10 @@
 *.la
 Makefile
 Makefile.in
+/libtool
+/po/stamp-it
+/src/.libs/*
+/src/.deps/*
 /autom4te.cache
 /aclocal.m4
 /config.h.in
@@ -16,3 +20,6 @@ Makefile.in
 /config.status
 /depcomp
 /install-sh
+/config.guess
+/config.sub
+/ltmain.sh
