@@ -907,7 +907,8 @@ quimby_filter_keypress (GtkIMContext *context,
 
     if (!context_quimby->chord_state)
     {
-    	if (event->type == GDK_KEY_PRESS)
+    	if (event->type == GDK_KEY_PRESS && 
+	    (event->keyval != context_quimby->last_keyval || context_quimby->last_event_type != GDK_KEY_PRESS))
 	{
 	    if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index) && word_start_context(text, cursor_index))
 	    {
@@ -919,7 +920,8 @@ quimby_filter_keypress (GtkIMContext *context,
     }
     else
     {
-	if (event->type == GDK_KEY_PRESS)
+	if (event->type == GDK_KEY_PRESS && 
+	    (event->keyval != context_quimby->last_keyval || context_quimby->last_event_type != GDK_KEY_PRESS))
 	{
 	    context_quimby->num_keys_down++;
 	    add_to_chord(context_quimby, event->keyval);
@@ -939,7 +941,8 @@ quimby_filter_keypress (GtkIMContext *context,
 	    }
 	}
     }
-
+    context_quimby->last_event_type = event->type;
+    context_quimby->last_keyval = event->keyval;
     return ((GtkIMContextClass *)parent_class)->filter_keypress(context, event);
 }
 

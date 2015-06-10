@@ -46,6 +46,8 @@ struct _GtkIMQuimbyContext
     guint num_keys_down;
     gboolean chord_state;
     gboolean space_in_chord;
+    GdkEventType last_event_type;
+    guint last_keyval;
 //    GtkWidget *widget;
 };
 
