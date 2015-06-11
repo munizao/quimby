@@ -8,7 +8,7 @@ When this has been installed, you can choose the "quimby" menu item from the "In
 Experimental features:
 · Toggling capitalization. (F23 key)
 · Transposing characters. (F22 key)
-· Chording for common English words. 
+· Chording for common English words. This is still very much under construction, but with the cursor positioned after a space, try pressing [space] and t at the same time. You should get the word "the". A list of avilable key combos is in src/chording.c. 
 
 *** Compiling and installing
 
