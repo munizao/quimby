@@ -1,6 +1,6 @@
 *** Introduction
 
-Quimby is a GTK+ input method which has some extra features that I found lacking in the default gtk input method. A large number of extra compose sequences are included. Another handy feature is the ability to paste from the Primary selection. If you've wanted to use the keyboard to paste selected text in the same way that you can with the middle mouse button on a Linux desktop, now you can. Use <compose> + <insert> if you have a compose key, or map the F24 key, (which I presume you don't physically have) to the key of your choice.
+Quimby is a GTK+ input method which has some extra features that I found lacking in the default GTK+ input method. A large number of extra compose sequences are included. Another handy feature is the ability to paste from the Primary selection. If you've wanted to use the keyboard to paste selected text in the same way that you can with the middle mouse button on a Linux desktop, now you can. Use <compose> + <insert> if you have a compose key, or map the F24 key, (which I presume you don't physically have) to the key of your choice.
 
 
 When this has been installed, you can choose the "quimby" menu item from the "Input Methods" submenu when right-clicking in a GTK+ text entry area. In most cases it will automatically be the default input method once installed.
@@ -8,6 +8,27 @@ When this has been installed, you can choose the "quimby" menu item from the "In
 Experimental features:
 · Toggling capitalization. (F23 key)
 · Transposing characters. (F22 key)
+· Chording for common English words. 
+
+*** Compiling and installing
+
+First, you need the gtk headers, and the gtk utilities package that contains gtk-query-immodules-2.0, which is the program we need in order to put the input mathod on the list of installed input methods that gtk apps can see and use. In Debian and Debian derived distros like Ubuntu and Mint, these should be the packages you want:
+
+libgtk2.0-dev
+libgtk2.0-bin
+
+Here is the incantation I needed to get it to configure properly. There is probably a way to fix things so you don't need to do this. I don't know what that would be.
+
+GTK_QUERY_IMMODULES=/usr/lib/x86_64-linux-gnu/libgtk2.0-0/gtk-query-immodules-2.0 ./autogen.sh --libdir=/usr/lib/x86_64-linux-gnu/
+
+If that doesn't work, see if gtk-query-immodules-2.0 is somewhere else, and adjust accordingly.
+
+After that:
+
+make
+make install
+
+should work as usual.
 
 *** Contact
 
