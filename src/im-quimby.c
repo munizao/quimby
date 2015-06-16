@@ -910,11 +910,14 @@ quimby_filter_keypress (GtkIMContext *context,
     	if (event->type == GDK_KEY_PRESS && 
 	    (event->keyval != context_quimby->last_keyval || context_quimby->last_event_type != GDK_KEY_PRESS))
 	{
-	    if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index) && word_start_context(text, cursor_index))
+	    if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
 	    {
-		context_quimby->chord_state = TRUE;
-		context_quimby->num_keys_down++;
-		add_to_chord(context_quimby, event->keyval);
+		if  (word_start_context(text, cursor_index))
+		{
+		    context_quimby->chord_state = TRUE;
+		    context_quimby->num_keys_down++;
+		    add_to_chord(context_quimby, event->keyval);
+		}
 	    }
 	}
     }

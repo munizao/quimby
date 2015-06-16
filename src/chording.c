@@ -9,18 +9,22 @@ static gchar* chords[] = {
     "t", "the ",
     "f", "of ",
     "fo", "of ",
-    "d", "and ",
-    "dt", "and the ",
     "f", "of ",
     "ft", "of the ",
+    "d", "and ",
+    "dt", "and the ",
     "a", "a ",
     "n", "in ",
     "in", "in ",
     "nt", "in the ",
+    "it", "it ",
     "o", "to ",
     "ot", "to ",
     "s", "is ",
     "is", "is ",
+    "aw", "was ",
+    "sw", "was ",
+    "st", "this ",
     "i", "I ",
     "fr", "for ",
     "/f", "for ",
@@ -38,6 +42,7 @@ static gchar* chords[] = {
     "at", "at ",
     "u" , "you ",
     "k", "can ",
+    "kn", "can ",
     "h", "have ",
     "hv", "have ",
     "dh", "had ",
@@ -75,12 +80,15 @@ static gchar* chords[] = {
     "km", "make ",
     "dm", "made ",
     "mg", "making ",
+    "kt", "take ", 
     "dhs", "should ",
     "hm", "him ",
     "hr", "her ",
     "c", "see ",
     "cg", "seeing ",
     "cw", "saw ",
+    "cn", "seen ",
+    "cd", "seed ",
     "/sw", "saw ",
     "/c", "about ",
     "v", "very ",
@@ -91,7 +99,7 @@ static gchar* chords[] = {
     "al", "all ",
     "~", "about ",
     "yr", "your ",
-    "ur", "your ",
+    "ru", "your ",
     "\'ru", "you\'re ",
     "'ry", "you\'re ",
     "\'u", "you're ",
@@ -195,14 +203,12 @@ static guint32 keyvals[];
 gboolean
 word_start_context (gchar *text, gint cursor_index)
 {
-    gboolean is_start = FALSE;
-    gunichar prev = g_utf8_get_char(text+cursor_index-1);
-    gunichar space = 0x20;
-    if (prev == space) /* Actual algorithm will be more complicated. */
+    // Actual algorithm will still be more complicated.
+    if (cursor_index == 0 || g_utf8_get_char(text+cursor_index-1) == 0x20)
     {
-	is_start = TRUE;
+	return TRUE;
     }
-    return is_start;
+    return FALSE;
 }
 
 void
