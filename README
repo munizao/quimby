@@ -26,7 +26,7 @@ If that doesn't work, see if gtk-query-immodules-2.0 is somewhere else, and adju
 After that:
 
 make
-make install
+sudo make install
 
 should work as usual.
 

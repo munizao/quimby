@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <glib.h>
 #include "im-quimby.h"
+#include "chording.h"
 
 /* Support for chorded input */
 
@@ -52,6 +53,11 @@ static gchar* chords[] = {
     "r", "are ",
     "aer", "are ",
     "-", "not ",
+    "-s", "is not ",
+    "-w", "will not ",
+    "-d", "do not ",
+    "-h", "have not ",
+    "-i", "I am not ",
     "rw", "were ",
     "bt", "but ",
     "bu", "but ",
@@ -92,7 +98,7 @@ static gchar* chords[] = {
     "/sw", "saw ",
     "/c", "about ",
     "v", "very ",
-    "so", "so ",
+    "os", "so ",
     "my", "my ",
     "pu", "up ",
     "ou", "out ",
@@ -112,6 +118,7 @@ static gchar* chords[] = {
     "\'t", "they\'re ",
     "\'w", "we\'re ",
     "\'k", "can\'t ",
+    "\'d", "don\'t ",
     "tw", "what ",
     "ow", "who ",
     "ms", "some ",
@@ -200,15 +207,34 @@ static gchar* chords[] = {
 
 static guint32 keyvals[];
 
-gboolean
-word_start_context (gchar *text, gint cursor_index)
+StartPositionType
+start_position (gchar *text, gint cursor_index)
 {
-    // Actual algorithm will still be more complicated.
-    if (cursor_index == 0 || g_utf8_get_char(text+cursor_index-1) == 0x20)
+    guint last_char = 0;
+    guint second_last_char = 0;
+    if (cursor_index >= 1)
     {
-	return TRUE;
+	last_char = g_utf8_get_char(text+cursor_index-1);
     }
-    return FALSE;
+
+    if (cursor_index >= 2)
+    {
+	second_last_char = g_utf8_get_char(text+cursor_index-2);
+    }
+
+    if (cursor_index == 0 ||
+	(last_char == ' ' &&
+	 (second_last_char == '.' ||
+	  second_last_char == '!' ||
+	  second_last_char == '?')))
+    {
+	return SENTENCE_START;
+    }
+    if (last_char == ' ')
+    {
+	return WORD_START;
+    }
+    return NOT_START;
 }
 
 void
@@ -251,6 +277,7 @@ void
 clear_chord (GtkIMQuimbyContext *context)
 {
     context->chord_length = 0;
+    context->chord_capital = FALSE;
     context->chord_state = FALSE;
     context->space_in_chord = FALSE;
 }
@@ -262,7 +289,6 @@ chord_lookup (GtkIMQuimbyContext *context)
     {
 	return NULL;
     }
-
     gpointer text_ptr;
     //gconstpointer key;
     int i;
@@ -285,6 +311,8 @@ chord_lookup (GtkIMQuimbyContext *context)
     {
 	pos += g_unichar_to_utf8(context->chord_chars[i], buf + pos);
     }
+    // Oh hey, yeah, null terminating strings is good.
+    buf[pos] = 0;
 
     text_ptr = g_hash_table_lookup(context->chord_dict, buf);
     return text_ptr;

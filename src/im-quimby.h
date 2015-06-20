@@ -44,6 +44,7 @@ struct _GtkIMQuimbyContext
     guint chord_chars[MAX_CHORD_CHARS];
     guint chord_length;
     guint num_keys_down;
+    gboolean chord_capital;
     gboolean chord_state;
     gboolean space_in_chord;
     GdkEventType last_event_type;

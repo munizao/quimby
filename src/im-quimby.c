@@ -912,11 +912,16 @@ quimby_filter_keypress (GtkIMContext *context,
 	{
 	    if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
 	    {
-		if  (word_start_context(text, cursor_index))
+		StartPositionType startpos = start_position(text, cursor_index);
+		if (startpos != NOT_START)
 		{
+		    if (startpos == SENTENCE_START)
+		    {
+			context_quimby->chord_capital = TRUE;
+		    }
 		    context_quimby->chord_state = TRUE;
 		    context_quimby->num_keys_down++;
-		    add_to_chord(context_quimby, event->keyval);
+		    add_to_chord (context_quimby, event->keyval);
 		}
 	    }
 	}
@@ -927,7 +932,7 @@ quimby_filter_keypress (GtkIMContext *context,
 	    (event->keyval != context_quimby->last_keyval || context_quimby->last_event_type != GDK_KEY_PRESS))
 	{
 	    context_quimby->num_keys_down++;
-	    add_to_chord(context_quimby, event->keyval);
+	    add_to_chord (context_quimby, event->keyval);
 	}
 	if (event->type == GDK_KEY_RELEASE)
 	{
@@ -938,6 +943,17 @@ quimby_filter_keypress (GtkIMContext *context,
 		if (text)
 		{
 		    gtk_im_context_delete_surrounding (GTK_IM_CONTEXT (context), -context_quimby->chord_length - 1, context_quimby->chord_length + 1);
+		    if (context_quimby->chord_capital)
+		    {
+			guint pos;
+			gchar first_char_utf8_buf[20];
+			gunichar first_char = g_utf8_get_char (text);
+			first_char = g_unichar_toupper (first_char);
+			pos = g_unichar_to_utf8 (first_char, first_char_utf8_buf);
+			first_char_utf8_buf[pos] = 0;
+			g_signal_emit_by_name (context, "commit", first_char_utf8_buf);
+			text = g_utf8_next_char(text);
+		    }
 		    g_signal_emit_by_name (context, "commit", text);
 		}
 		clear_chord (context_quimby);
@@ -946,7 +962,7 @@ quimby_filter_keypress (GtkIMContext *context,
     }
     context_quimby->last_event_type = event->type;
     context_quimby->last_keyval = event->keyval;
-    return ((GtkIMContextClass *)parent_class)->filter_keypress(context, event);
+    return ((GtkIMContextClass *)parent_class)->filter_keypress (context, event);
 }
 
 static void
@@ -969,7 +985,14 @@ quimby_init (GtkIMQuimbyContext *im_context)
 				     quimby_compose_seqs,
 				     4,
 				     G_N_ELEMENTS (quimby_compose_seqs) / 6);
-    load_dictionary(im_context);
+    load_dictionary (im_context);
+    im_context->chord_length = 0;
+    im_context->num_keys_down = 0;
+    im_context->chord_capital = FALSE;
+    im_context->chord_state = FALSE;
+    im_context->space_in_chord = FALSE;
+    im_context->last_event_type = GDK_NOTHING;
+    
 }
 
 
