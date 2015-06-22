@@ -17,6 +17,7 @@ Makefile.in
 /config.guess
 /missing
 /stamp-h1
+/compile
 /config.log
 /config.status
 /depcomp
