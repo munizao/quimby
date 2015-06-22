@@ -145,10 +145,10 @@ static guint16 quimby_compose_seqs[] = {
   GDK_Multi_key,	GDK_plus,	GDK_0,	0,	0,	0x2295,	/* CIRCLED_PLUS */
   GDK_Multi_key,	GDK_plus,	GDK_O,	0,	0,	0x2295,	/* CIRCLED_PLUS */
   GDK_Multi_key,	GDK_plus,	GDK_o,	0,	0,	0x2295,	/* CIRCLED_PLUS */
-  GDK_Multi_key,	GDK_comma,	GDK_Left,	0,	0,	0x0328,	/* COMBINING_OGONEK */
-  GDK_Multi_key,	GDK_comma,	GDK_KP_Left,	0,	0,	0x0328,	/* COMBINING_OGONEK */
   GDK_Multi_key,	GDK_comma,	GDK_O,	0,	0,	0x01EA,	/* LATIN_CAPITAL_LETTER_O_WITH_OGONEK */
   GDK_Multi_key,	GDK_comma,	GDK_o,	0,	0,	0x01EB,	/* LATIN_SMALL_LETTER_O_WITH_OGONEK */
+  GDK_Multi_key,	GDK_comma,	GDK_Left,	0,	0,	0x0328,	/* COMBINING_OGONEK */
+  GDK_Multi_key,	GDK_comma,	GDK_KP_Left,	0,	0,	0x0328,	/* COMBINING_OGONEK */
   GDK_Multi_key,	GDK_minus,	GDK_space,	0,	0,	0x007E,	/* TILDE */
   GDK_Multi_key,	GDK_minus,	GDK_parenleft,	0,	0,	0x007B,	/* LEFT_CURLY_BRACKET */
   GDK_Multi_key,	GDK_minus,	GDK_parenright,	0,	0,	0x007D,	/* RIGHT_CURLY_BRACKET */
