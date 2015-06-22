@@ -32,6 +32,8 @@
 #include <string.h>
 
 #include "im-extra-intl.h"
+#include "im-quimby.h"
+#include "chording.h"
 
 typedef struct _GtkComposeTable GtkComposeTable;
 
@@ -776,8 +778,8 @@ static const GtkComposeTable quimby_compose_table = {
   G_N_ELEMENTS (quimby_compose_seqs) / 6
 };
 
-static void     quimby_class_init         (GtkIMContextSimpleClass  *class);
-static void     quimby_init               (GtkIMContextSimple       *im_context_simple);
+static void     quimby_class_init         (GtkIMQuimbyContextClass  *class);
+static void     quimby_init               (GtkIMQuimbyContext       *im_context_simple);
 
 static GtkIMContextSimpleClass *parent_class = NULL;
 
@@ -792,26 +794,36 @@ static const GtkIMContextInfo quimby_info =
   "br:ca:ch:cs:cy:da:de:en:eo:es:et:eu:fi:fo:fr:fy:ga:gd:gl:hr:hu:id:is:it:kl:lb:lt:lv:mi:mt:nl:no:oc:pl:pt:rm:sk:sl:sq:sv:tk:tl:tn",            /* Languages for which this module is the default */  
 };
 
-static void
-quimby_register_type (GTypeModule *module)
+void
+gtk_quimby_im_context_register_type (GTypeModule *module)
 {
-  static const GTypeInfo object_info =
-  {
-    sizeof (GtkIMContextSimpleClass),
-    (GBaseInitFunc) NULL,
-    (GBaseFinalizeFunc) NULL,
-    (GClassInitFunc) quimby_class_init,
-    NULL,           /* class_finalize */
-    NULL,           /* class_data */
-    sizeof (GtkIMContextSimple),
-    0,              /* n_preallocs */
-    (GInstanceInitFunc) quimby_init,
-  };
-  type_quimby = 
-    g_type_module_register_type (module,
-                                 GTK_TYPE_IM_CONTEXT_SIMPLE,
-                                 "GtkIMContextSimpleQuimby",
-                                 &object_info, 0);
+    if (type_quimby == 0)
+    {
+	static const GTypeInfo object_info =
+	    {
+		sizeof (GtkIMQuimbyContextClass),
+		(GBaseInitFunc) NULL,
+		(GBaseFinalizeFunc) NULL,
+		(GClassInitFunc) quimby_class_init,
+		NULL,           /* class_finalize */
+		NULL,           /* class_data */
+		sizeof (GtkIMQuimbyContext),
+		0,              /* n_preallocs */
+		(GInstanceInitFunc) quimby_init,
+		0,
+	    };
+	type_quimby = 
+	    g_type_module_register_type (module,
+					 GTK_TYPE_IM_CONTEXT_SIMPLE,
+					 "GtkIMContextSimpleQuimby",
+					 &object_info, 0);
+    }
+}
+
+GType gtk_quimby_im_context_get_type(void)
+{
+  g_assert(type_quimby != 0);
+  return type_quimby;
 }
 
 
@@ -829,6 +841,7 @@ quimby_filter_keypress (GtkIMContext *context,
 				       GdkEventKey  *event)
 {
     GtkIMContextSimple *context_simple = GTK_IM_CONTEXT_SIMPLE (context);
+    GtkIMQuimbyContext *context_quimby = GTK_QUIMBY_IM_CONTEXT (context);
     gunichar toggled = 0;
     gchar *text;
     gint cursor_index;
@@ -896,11 +909,69 @@ quimby_filter_keypress (GtkIMContext *context,
 	    
 	}
     }
-    return ((GtkIMContextClass *)parent_class)->filter_keypress(context, event);
+
+    if (!context_quimby->chord_state)
+    {
+    	if (event->type == GDK_KEY_PRESS && 
+	    (event->keyval != context_quimby->last_keyval || context_quimby->last_event_type != GDK_KEY_PRESS))
+	{
+	    if (gtk_im_context_get_surrounding(GTK_IM_CONTEXT (context), &text, &cursor_index))
+	    {
+		StartPositionType startpos = start_position(text, cursor_index);
+		if (startpos != NOT_START)
+		{
+		    if (startpos == SENTENCE_START)
+		    {
+			context_quimby->chord_capital = TRUE;
+		    }
+		    context_quimby->chord_state = TRUE;
+		    context_quimby->num_keys_down++;
+		    add_to_chord (context_quimby, event->keyval);
+		}
+	    }
+	}
+    }
+    else
+    {
+	if (event->type == GDK_KEY_PRESS && 
+	    (event->keyval != context_quimby->last_keyval || context_quimby->last_event_type != GDK_KEY_PRESS))
+	{
+	    context_quimby->num_keys_down++;
+	    add_to_chord (context_quimby, event->keyval);
+	}
+	if (event->type == GDK_KEY_RELEASE)
+	{
+	    context_quimby->num_keys_down--;
+	    if (context_quimby->num_keys_down == 0)
+	    {
+		text = chord_lookup(context_quimby);
+		if (text)
+		{
+		    gtk_im_context_delete_surrounding (GTK_IM_CONTEXT (context), -context_quimby->chord_length - 1, context_quimby->chord_length + 1);
+		    if (context_quimby->chord_capital)
+		    {
+			guint pos;
+			gchar first_char_utf8_buf[20];
+			gunichar first_char = g_utf8_get_char (text);
+			first_char = g_unichar_toupper (first_char);
+			pos = g_unichar_to_utf8 (first_char, first_char_utf8_buf);
+			first_char_utf8_buf[pos] = 0;
+			g_signal_emit_by_name (context, "commit", first_char_utf8_buf);
+			text = g_utf8_next_char(text);
+		    }
+		    g_signal_emit_by_name (context, "commit", text);
+		}
+		clear_chord (context_quimby);
+	    }
+	}
+    }
+    context_quimby->last_event_type = event->type;
+    context_quimby->last_keyval = event->keyval;
+    return ((GtkIMContextClass *)parent_class)->filter_keypress (context, event);
 }
 
 static void
-quimby_class_init (GtkIMContextSimpleClass *klass)
+quimby_class_init (GtkIMQuimbyContextClass *klass)
 {
     parent_class = GTK_IM_CONTEXT_SIMPLE_CLASS (g_type_class_peek (g_type_parent (type_quimby)));
     ((GtkIMContextClass *)klass)->filter_keypress = quimby_filter_keypress;
@@ -913,12 +984,20 @@ im_module_exit ()
 }
 
 static void
-quimby_init (GtkIMContextSimple *im_context_simple)
+quimby_init (GtkIMQuimbyContext *im_context)
 {
-    gtk_im_context_simple_add_table (im_context_simple,
+    gtk_im_context_simple_add_table (GTK_IM_CONTEXT_SIMPLE (im_context),
 				     quimby_compose_seqs,
 				     4,
 				     G_N_ELEMENTS (quimby_compose_seqs) / 6);
+    load_dictionary (im_context);
+    im_context->chord_length = 0;
+    im_context->num_keys_down = 0;
+    im_context->chord_capital = FALSE;
+    im_context->chord_state = FALSE;
+    im_context->space_in_chord = FALSE;
+    im_context->last_event_type = GDK_NOTHING;
+    
 }
 
 
@@ -931,7 +1010,7 @@ static const GtkIMContextInfo *info_list[] =
 void
 im_module_init (GTypeModule *module)
 {
-    quimby_register_type (module);
+    gtk_quimby_im_context_register_type (module);
 }
 
 
@@ -947,7 +1026,10 @@ GtkIMContextSimple *
 im_module_create (const gchar *context_id)
 {
     if (strcmp (context_id, "quimby") == 0)
-	return GTK_IM_CONTEXT_SIMPLE (g_object_new (type_quimby, NULL));
+    {
+	GtkIMContext* imcontext = GTK_IM_CONTEXT (g_object_new (GTK_TYPE_QUIMBY_IM_CONTEXT, NULL));
+	return imcontext;
+    }
     else
 	return NULL;
 }

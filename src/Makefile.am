@@ -13,6 +13,9 @@ immodules_LTLIBRARIES = im-quimby.la
 
 im_quimby_la_SOURCES =	\
 	im-quimby.c	\
+	im-quimby.h	\
+	chording.c	\
+	chording.h	\
 	im-extra-intl.h
 
 # The location of the gettext catalogs as defined by AM_GLIB_GNU_GETTEXT().
@@ -41,12 +44,12 @@ install-data-hook:
 	  $(install_sh) -d "$(gtk_confdir)" || exit 1; \
 	  dir=`expr "X$(immodulesdir)" : 'X\(.*\)[\\/].*[\\/]'`; \
 	  if test -z "$$GTK_PATH"; then GTK_PATH=$$dir; else GTK_PATH=$$dir:$$GTK_PATH; fi; \
-	  echo " GTK_PATH=$$GTK_PATH $(GTK_QUERY_IMMODULES) >$(gtk_immodules)"; \
-	  export GTK_PATH; $(GTK_QUERY_IMMODULES) >"$(gtk_immodules)" || exit 1; \
+	  echo " GTK_PATH=$$GTK_PATH $(GTK_QUERY_IMMODULES) --update-cache"; \
+	  export GTK_PATH; $(GTK_QUERY_IMMODULES) --update-cache || exit 1; \
 	else :; fi
 
 uninstall-hook:
 	@$(POST_UNINSTALL)
-	if test -z "$(DESTDIR)" && test -f "$(gtk_immodules)"; then \
-	  $(GTK_QUERY_IMMODULES) >$(gtk_immodules); \
+	if test -z "$(DESTDIR)"; then \
+	  $(GTK_QUERY_IMMODULES) --update-cache; \
 	else :; fi
